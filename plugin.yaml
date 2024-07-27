@@ -1,0 +1,13 @@
+name: "revisor"
+version: "0.1.0"
+usage: "Revise Yaml in standard procedure"
+description: |-
+  This plugin revise Yaml data from stdin with sensitive information referrenced by args
+ignoreFlags: false
+useTunnel: false
+command: "$HELM_PLUGIN_DIR/revisor.sh"
+platformCommand:
+  - os: linux
+    command: "$HELM_PLUGIN_DIR/revisor.bash"
+  - os: darwin
+    command: "$HELM_PLUGIN_DIR/revisor.zsh"
