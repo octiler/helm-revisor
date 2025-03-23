@@ -17,8 +17,8 @@ cd `git rev-parse --show-toplevel`/classified || err 120 cannot find classified 
 ## Refs: https://github.com/google/re2/wiki/Syntax
 # ------------------------------------------------------------------------------------------------------------------------------
 function preprocess () {
-    yq '(.. | select(tag == "!!str" and test("^<\|.*[[:alnum:]._-]+@.*\|>$"))) |= (. as $item|
-            capture("^<\|(?<prefix>.*?)(?<keyset>[[:alnum:]._-]+)@(?<keypath>[[:alnum:]._]*)(?<suffix>.*?)\|>$") as $match
+    yq '(.. | select(tag == "!!str" and test("^<\|.*[[:alnum:]./_-]+@.*\|>$"))) |= (. as $item|
+            capture("^<\|(?<prefix>.*?)(?<keyset>[[:alnum:]./_-]+)@(?<keypath>[[:alnum:]._]*)(?<suffix>.*?)\|>$") as $match
             |$match|[
                         "<|",
                         .prefix,
@@ -43,7 +43,7 @@ until [[ "$preprocessing" == "$preprocessed" ]];do
 done
 
 # matches=(`echo "$preprocessed" | grep -oP "^<\|.*[\w.-_]+@.*\|>$" || true`)
-matches=(`echo "$preprocessed" | grep -oE "^<\|.*[[:alnum:]._-]+@.*\|>$" || true`)
+matches=(`echo "$preprocessed" | grep -oE "^<\|.*[[:alnum:]./_-]+@.*\|>$" || true`)
 [[ ${#matches[@]} -eq 0 ]] || err 121 cannot preprocess the pattern followed: ${matches[0]}
 
 # ------------------------------------------------------------------------------------------------------------------------------
@@ -69,8 +69,8 @@ matches=(`echo "$parsed" | grep -oE "^<\|.*\|>$" || true`)
 
 # ------------------------------------------------------------------------------------------------------------------------------
 function unveil () {
-    yq '(.. | select(tag == "!!str" and test("[[:alnum:]._-]+@[[:alnum:]._-]*([[:space:]]*\|[^|~]*)*~>"))) |= (. as $item|
-            capture("<~(?<keyset>[[:alnum:]._-]+)@(?<keypath>[[:alnum:]._-]*)(?<keyprocessor>([[:space:]]*\|[^|~]*)*)~>") as $match
+    yq '(.. | select(tag == "!!str" and test("[[:alnum:]./_-]+@[[:alnum:]._-]*([[:space:]]*\|[^|~]*)*~>"))) |= (. as $item|
+            capture("<~(?<keyset>[[:alnum:]./_-]+)@(?<keypath>[[:alnum:]._-]*)(?<keyprocessor>([[:space:]]*\|[^|~]*)*)~>") as $match
             |$item|sub(
                 $match|["<~",.keyset,"@",.keypath,.keyprocessor,"~>"]|join("")
                     |sub("\\\\","\\\\")
@@ -101,7 +101,7 @@ until [[ "$unveiling" == "$unveiled" ]];do
 done
 
 # matches=(`echo "$unveiled" | grep -oP "<~[\w.-_]+@[\w.-_]*(\s*\|[^|~]*)*~>" || true`)
-matches=(`echo "$unveiled" | grep -oE "<~[[:alnum:].-_]+@[[:alnum:].-_]*([[:space:]]*\|[^|~]*)*~>" || true`)
+matches=(`echo "$unveiled" | grep -oE "<~[[:alnum:]./_-]+@[[:alnum:]._-]*([[:space:]]*\|[^|~]*)*~>" || true`)
 [[ ${#matches[@]} -eq 0 ]] || err 122 cannot unveil the pattern followed: ${matches[0]}
 
 # ------------------------------------------------------------------------------------------------------------------------------
